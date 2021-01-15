@@ -12,6 +12,7 @@ class Player:
         self.playlist = []
         self.file_names = []
         self.get_music_library()
+        self.current_song = -1
 
         print(self.playlist)
         print(self.file_names)
@@ -49,6 +50,12 @@ class Player:
     
     def get_song(self, index):
         return self.playlist[index]
+
+    def get_file_name(self, index):
+        return self.file_names[index]
+
+    def get_current_song(self):
+        return self.current_song
 
 
 
@@ -102,11 +109,15 @@ class GUI:
 
         self.root.mainloop()
 
+        print("hello world")
+
 
     def play_song(self):
         result = self.scr_playlist.curselection()
-        print(self.player.get_song(result[0]))
+        file_path = "./music/" + self.player.get_file_name(result[0])
+        playsound(file_path)
+        # print(self.player.get_song(result[0]))
+
 
 if __name__ == "__main__":
-    # graphic = GUI()
-    playsound("./music/[insert file name]")
+    graphic = GUI()
