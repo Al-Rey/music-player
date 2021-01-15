@@ -2,6 +2,8 @@ import os
 import re
 # from tkinter import *
 import tkinter as tk
+# import playsound
+from playsound import playsound
 
 PATH = "./music"
 
@@ -106,4 +108,5 @@ class GUI:
         print(self.player.get_song(result[0]))
 
 if __name__ == "__main__":
-    graphic = GUI()
+    # graphic = GUI()
+    playsound("./music/[insert file name]")
