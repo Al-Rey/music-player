@@ -19,6 +19,7 @@ class Player:
         self.file_names = os.listdir(PATH)
         hold = []
 
+        # seperate the file names from the file types
         for name in self.file_names:
             temp = re.split("\.", name)
             print("seperated: ", temp)
@@ -31,18 +32,21 @@ class Player:
             else:
                 hold.append(temp[0])
             
-
+        # get only the song name into the playlist
         for song in hold:
             result = re.match("[0-9]", song)
 
             if result:
-                self.playlist.append(song[result.span()[1]+1:])
+                self.playlist.append(song[result.span()[1]+1:].strip())
             else:
-                self.playlist.append(song)
+                self.playlist.append(song.strip())
 
-
+    # fet the playlist variable
     def get_playlist(self):
         return self.playlist
+    
+    def get_song(self, index):
+        return self.playlist[index]
 
 
 
@@ -73,13 +77,12 @@ class GUI:
 
         self.my_scroll.config(command=self.scr_playlist.yview)
 
-
         #  create the buttons
         self.frm_buttons = tk.Frame(master=self.root, bg="green", bd = 3, width=300, height=250)   # the main frame
 
         self.frm_grid = tk.Frame(master=self.frm_buttons, bg="blue")    # the grid frame that holds the buttons
 
-        self.btn_play = tk.Button(master=self.frm_grid, text="play", font="80", width=8)
+        self.btn_play = tk.Button(master=self.frm_grid, text="play", font="80", width=8, command=self.play_song)
         self.btn_pause = tk.Button(master=self.frm_grid, text="pause", font="80", width=8)
         self.btn_next = tk.Button(master=self.frm_grid, text="next", font="80", width=8)
         self.btn_back = tk.Button(master=self.frm_grid, text="back", font="80", width=8)
@@ -97,6 +100,10 @@ class GUI:
 
         self.root.mainloop()
 
+
+    def play_song(self):
+        result = self.scr_playlist.curselection()
+        print(self.player.get_song(result[0]))
 
 if __name__ == "__main__":
     graphic = GUI()
