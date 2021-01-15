@@ -1,4 +1,5 @@
 import os
+import re
 # from tkinter import *
 import tkinter as tk
 
@@ -7,19 +8,48 @@ PATH = "./music"
 class Player:
     def __init__(self):
         self.playlist = []
+        self.file_names = []
         self.get_music_library()
+
+        print(self.playlist)
+        print(self.file_names)
 
     # get the names of the songs in the music folder
     def get_music_library(self):
-        self.playlist = os.listdir(PATH)
+        self.file_names = os.listdir(PATH)
+        hold = []
+
+        for name in self.file_names:
+            temp = re.split("\.", name)
+            print("seperated: ", temp)
+
+            build = ""
+            if len(temp) > 2:
+                for i in range(0, len(temp)-1):
+                    build += temp[i]
+                hold.append(build)
+            else:
+                hold.append(temp[0])
+            
+
+        for song in hold:
+            result = re.match("[0-9]", song)
+
+            if result:
+                self.playlist.append(song[result.span()[1]+1:])
+            else:
+                self.playlist.append(song)
+
 
     def get_playlist(self):
-        return self.play
+        return self.playlist
 
 
 
 class GUI:
     def __init__(self):
+        self.player = Player()
+
         # making the window
         self.root = tk.Tk()
         self.root.geometry("300x500")
@@ -37,7 +67,7 @@ class GUI:
         self.my_scroll.pack(side=tk.RIGHT, fill=tk.Y)
 
         self.scr_playlist = tk.Listbox(master=self.frm_song_name, yscrollcommand=self.my_scroll.set, width=40, bd=4)
-        for line in range(1, 100):
+        for line in self.player.get_playlist():
             self.scr_playlist.insert(tk.END, str(line))
         self.scr_playlist.pack(side=tk.LEFT, fill=tk.BOTH)
 
