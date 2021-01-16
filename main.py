@@ -70,6 +70,12 @@ class Player:
         index = random.randint(0, self.library_size-1)
         return index
 
+    def set_current_song(self, num):
+        self.current_song = num
+
+    def get_library_size(self):
+        return self.library_size
+
 
 
 class GUI:
@@ -144,6 +150,9 @@ class GUI:
                 if self.play_background.is_alive():
                     self.play_background.terminate()
                              
+                # set the selected song as the current song
+                self.player.set_current_song(result[0])
+
                 # play the audio file
                 self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
                 self.play_background.start()
@@ -165,6 +174,9 @@ class GUI:
         # get the file path for the audio file
         file_path = "./music/" + self.player.get_file_name(song_index)
 
+        # set this song as the current song
+        self.player.set_current_song(song_index)
+
         # checks if there is a song already playing, stop it
         if self.play_background.is_alive():
             self.play_background.terminate()
@@ -175,23 +187,62 @@ class GUI:
 
 
     def forward(self):
-        print("Forward button pressed")
+        if self.player.get_current_song() != self.player.get_library_size()-1:
+            song_index = self.player.get_current_song() + 1
+            print(song_index)
+
+            # get the file path for the audio file
+            file_path = "./music/" + self.player.get_file_name(song_index)
+
+            # set this song as the current song
+            self.player.set_current_song(song_index)
+
+            # checks if there is a song already playing, stop it
+            if self.play_background.is_alive():
+                self.play_background.terminate()
+                            
+            # play the audio file
+            self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
+            self.play_background.start()
+        else:
+            song_index = 0
+            print(song_index)
+
+            # get the file path for the audio file
+            file_path = "./music/" + self.player.get_file_name(song_index)
+
+            # set this song as the current song
+            self.player.set_current_song(song_index)
+
+            # checks if there is a song already playing, stop it
+            if self.play_background.is_alive():
+                self.play_background.terminate()
+                            
+            # play the audio file
+            self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
+            self.play_background.start()
 
     def backward(self):
         print("Backward button pressed")
 
     # helper song
-    # def play_song(self, index):
-    #     # get the file path for the audio file
-    #     file_path = "./music/" + self.player.get_file_name(result[index])
+    def play_song(self, index):
+        song_index = index
+        print(song_index)
 
-    #     # checks if there is a song already playing, stop it
-    #     if self.play_background.is_alive():
-    #         self.play_background.terminate()
+        # get the file path for the audio file
+        file_path = "./music/" + self.player.get_file_name(song_index)
+
+        # set this song as the current song
+        self.player.set_current_song(song_index)
+
+        # checks if there is a song already playing, stop it
+        if self.play_background.is_alive():
+            self.play_background.terminate()
                         
-    #     # play the audio file
-    #     self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
-    #     self.play_background.start()
+        # play the audio file
+        self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
+        self.play_background.start()
 
 
 if __name__ == "__main__":
