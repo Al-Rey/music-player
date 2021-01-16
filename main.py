@@ -1,7 +1,7 @@
 import os
 import re
 import random
-# from tkinter import *
+from tkinter import *
 import tkinter as tk
 # import playsound
 from playsound import playsound
@@ -92,7 +92,12 @@ class GUI:
 
         # create the music name label
         self.frm_song_name = tk.Frame(master=self.root, bg="red", bd=3, height=250, width=300)
-        self.lbl_song = tk.Label(master=self.frm_song_name, text="[enter song here]", bd=3)
+
+        # text in the label
+        self.song_name = StringVar()
+        self.song_name.set("[enter song here]")
+
+        self.lbl_song = tk.Label(master=self.frm_song_name, textvariable=self.song_name, bd=3)
 
         self.lbl_song.pack(fill=tk.BOTH)
 
@@ -117,7 +122,7 @@ class GUI:
         self.btn_play = tk.Button(master=self.frm_grid, text="play", font="80", width=8, command=self.play)
         self.btn_pause = tk.Button(master=self.frm_grid, text="pause", font="80", width=8, command=self.pause)
         self.btn_next = tk.Button(master=self.frm_grid, text="next", font="80", width=8, command=self.forward)
-        self.btn_back = tk.Button(master=self.frm_grid, text="back", font="80", width=8)
+        self.btn_back = tk.Button(master=self.frm_grid, text="back", font="80", width=8, command=self.backward)
         self.btn_shufful = tk.Button(master=self.frm_grid, text="shufful", font="80", width=8, command=self.shuffle)
 
         self.btn_play.grid(row=1, column=2)
@@ -153,6 +158,10 @@ class GUI:
                 # set the selected song as the current song
                 self.player.set_current_song(result[0])
 
+                # get song name
+                name = self.player.get_song(self.player.get_current_song())
+                self.song_name.set(name)
+
                 # play the audio file
                 self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
                 self.play_background.start()
@@ -167,63 +176,23 @@ class GUI:
     def pause(self):
         print("Pause button pressed")
 
+    # plays a random song
     def shuffle(self):
-        song_index = self.player.get_random_song()
-        print(song_index)
+        self.play_song(self.player.get_random_song())
 
-        # get the file path for the audio file
-        file_path = "./music/" + self.player.get_file_name(song_index)
-
-        # set this song as the current song
-        self.player.set_current_song(song_index)
-
-        # checks if there is a song already playing, stop it
-        if self.play_background.is_alive():
-            self.play_background.terminate()
-                        
-        # play the audio file
-        self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
-        self.play_background.start()
-
-
+    # plays the next song listed
     def forward(self):
         if self.player.get_current_song() != self.player.get_library_size()-1:
-            song_index = self.player.get_current_song() + 1
-            print(song_index)
-
-            # get the file path for the audio file
-            file_path = "./music/" + self.player.get_file_name(song_index)
-
-            # set this song as the current song
-            self.player.set_current_song(song_index)
-
-            # checks if there is a song already playing, stop it
-            if self.play_background.is_alive():
-                self.play_background.terminate()
-                            
-            # play the audio file
-            self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
-            self.play_background.start()
+            self.play_song(self.player.get_current_song()+1)
         else:
-            song_index = 0
-            print(song_index)
+            self.play_song(0)
 
-            # get the file path for the audio file
-            file_path = "./music/" + self.player.get_file_name(song_index)
-
-            # set this song as the current song
-            self.player.set_current_song(song_index)
-
-            # checks if there is a song already playing, stop it
-            if self.play_background.is_alive():
-                self.play_background.terminate()
-                            
-            # play the audio file
-            self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
-            self.play_background.start()
-
+    # plays the last song listed
     def backward(self):
-        print("Backward button pressed")
+        if self.player.get_current_song() != 0: # if the current song isn't the first one in the list
+            self.play_song(self.player.get_current_song()-1)
+        else:   # if the current song is the first one in the list
+            self.play_song(self.player.get_library_size()-1)
 
     # helper song
     def play_song(self, index):
@@ -240,6 +209,10 @@ class GUI:
         if self.play_background.is_alive():
             self.play_background.terminate()
                         
+        # get song name
+        name = self.player.get_song(song_index)
+        self.song_name.set(name)
+
         # play the audio file
         self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
         self.play_background.start()
