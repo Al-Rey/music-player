@@ -1,10 +1,10 @@
 import os
 import re
+import random
 # from tkinter import *
 import tkinter as tk
 # import playsound
 from playsound import playsound
-# import threading
 import multiprocessing
 
 PATH = "./music"
@@ -14,8 +14,10 @@ class Player:
     def __init__(self):
         self.playlist = []
         self.file_names = []
-        self.get_music_library()
         self.current_song = -1
+        self.library_size = 0
+
+        self.get_music_library()
 
         print(self.playlist)
         print(self.file_names)
@@ -46,6 +48,9 @@ class Player:
                 self.playlist.append(song[result.span()[1]+1:].strip())
             else:
                 self.playlist.append(song.strip())
+        
+        # get the total amount of items in the library
+        self.library_size = len(self.playlist)
 
     # fet the playlist variable
     def get_playlist(self):
@@ -59,6 +64,11 @@ class Player:
 
     def get_current_song(self):
         return self.current_song
+    
+    def get_random_song(self):
+        random.seed()
+        index = random.randint(0, self.library_size-1)
+        return index
 
 
 
@@ -102,7 +112,7 @@ class GUI:
         self.btn_pause = tk.Button(master=self.frm_grid, text="pause", font="80", width=8, command=self.pause)
         self.btn_next = tk.Button(master=self.frm_grid, text="next", font="80", width=8, command=self.forward)
         self.btn_back = tk.Button(master=self.frm_grid, text="back", font="80", width=8)
-        self.btn_shufful = tk.Button(master=self.frm_grid, text="shufful", font="80", width=8)
+        self.btn_shufful = tk.Button(master=self.frm_grid, text="shufful", font="80", width=8, command=self.shuffle)
 
         self.btn_play.grid(row=1, column=2)
         self.btn_pause.grid(row=3, column=2)
@@ -119,57 +129,69 @@ class GUI:
         print("hello world")
 
 
-    # def play_song(self):
-    #     # if self.player.get_current_song() != -1:
-    #     result = self.scr_playlist.curselection()
-    #     file_path = "./music/" + self.player.get_file_name(result[0])
-    #     playsound(file_path)
-    #     # print(self.player.get_song(result[0]))
-
     def play(self):
         if self.player.get_current_song() != -1:
+
             result = self.scr_playlist.curselection()   # get the selection that the user picked
-            print("User option:", result)
 
             # if the user picked something then play the music
             if result != ():
-                # checks if there is a song already playing
+
+                # get the file path for the audio file
+                file_path = "./music/" + self.player.get_file_name(result[0])
+
+                # checks if there is a song already playing, stop it
                 if self.play_background.is_alive():
                     self.play_background.terminate()
-                    # result = self.scr_playlist.curselection()
-                    file_path = "./music/" + self.player.get_file_name(result[0])
-                    
-                    self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
+                             
+                # play the audio file
+                self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
+                self.play_background.start()
 
-                    self.play_background.start()
-
-                # if there isn't a song currently playing
-                else:
-                    # result = self.scr_playlist.curselection()
-                    file_path = "./music/" + self.player.get_file_name(result[0])
-                    
-                    self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
-
-                    self.play_background.start()
             else:
                 print("nothing was selected!")
-                
+
         else:
             self.player.current_song=0
             print("Play button pressed")
-        # print(self.player.get_song(result[0]))
 
     def pause(self):
         print("Pause button pressed")
 
     def shuffle(self):
-        print("Shuffle button pressed")
+        song_index = self.player.get_random_song()
+        print(song_index)
+
+        # get the file path for the audio file
+        file_path = "./music/" + self.player.get_file_name(song_index)
+
+        # checks if there is a song already playing, stop it
+        if self.play_background.is_alive():
+            self.play_background.terminate()
+                        
+        # play the audio file
+        self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
+        self.play_background.start()
+
 
     def forward(self):
         print("Forward button pressed")
 
     def backward(self):
         print("Backward button pressed")
+
+    # helper song
+    # def play_song(self, index):
+    #     # get the file path for the audio file
+    #     file_path = "./music/" + self.player.get_file_name(result[index])
+
+    #     # checks if there is a song already playing, stop it
+    #     if self.play_background.is_alive():
+    #         self.play_background.terminate()
+                        
+    #     # play the audio file
+    #     self.play_background = multiprocessing.Process(target=playsound, args=(file_path,), daemon=True)
+    #     self.play_background.start()
 
 
 if __name__ == "__main__":
