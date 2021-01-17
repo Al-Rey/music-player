@@ -89,47 +89,48 @@ class GUI:
         # making the window
         self.root = tk.Tk()
         self.root.geometry("300x500")
+        self.root.title("Music Player")
 
         # create the music name label
-        self.frm_song_name = tk.Frame(master=self.root, bg="red", bd=3, height=250, width=300)
+        self.frm_song_name = tk.Frame(master=self.root, bg="#c2fff1", bd=3, height=250, width=300)
 
         # text in the label
         self.song_name = StringVar()
-        self.song_name.set("[enter song here]")
+        self.song_name.set("Welcome!")
 
-        self.lbl_song = tk.Label(master=self.frm_song_name, textvariable=self.song_name, bd=3)
+        self.lbl_song = tk.Label(master=self.frm_song_name, textvariable=self.song_name, bd=3 ,font="Arial 12")
 
-        self.lbl_song.pack(fill=tk.BOTH)
+        self.lbl_song.pack(fill=tk.BOTH, pady=3)
 
         self.frm_song_name.pack(expand=True, fill=tk.BOTH)
 
         # create a playlist list
         self.my_scroll = tk.Scrollbar(master=self.frm_song_name)
-        self.my_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        self.my_scroll.pack(side=tk.RIGHT, fill=tk.Y, padx=2)
 
-        self.scr_playlist = tk.Listbox(master=self.frm_song_name, yscrollcommand=self.my_scroll.set, width=40, bd=4)
+        self.scr_playlist = tk.Listbox(master=self.frm_song_name, yscrollcommand=self.my_scroll.set, width=40, bd=4, relief=tk.FLAT)
         for line in self.player.get_playlist():
             self.scr_playlist.insert(tk.END, str(line))
-        self.scr_playlist.pack(side=tk.LEFT, fill=tk.BOTH)
+        self.scr_playlist.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, pady=2)
 
         self.my_scroll.config(command=self.scr_playlist.yview)
 
         #  create the buttons
-        self.frm_buttons = tk.Frame(master=self.root, bg="green", bd = 3, width=300, height=250)   # the main frame
+        self.frm_buttons = tk.Frame(master=self.root, bg="#c2fff1", bd = 3, width=300, height=250)   # the main frame
 
-        self.frm_grid = tk.Frame(master=self.frm_buttons, bg="blue")    # the grid frame that holds the buttons
+        self.frm_grid = tk.Frame(master=self.frm_buttons, bg="#c2fff1")    # the grid frame that holds the buttons
 
-        self.btn_play = tk.Button(master=self.frm_grid, text="play", font="80", width=8, command=self.play)
-        self.btn_stop = tk.Button(master=self.frm_grid, text="stop", font="80", width=8, command=self.stop)
-        self.btn_next = tk.Button(master=self.frm_grid, text="next", font="80", width=8, command=self.forward)
-        self.btn_back = tk.Button(master=self.frm_grid, text="back", font="80", width=8, command=self.backward)
-        self.btn_shufful = tk.Button(master=self.frm_grid, text="shufful", font="80", width=8, command=self.shuffle)
+        self.btn_play = tk.Button(master=self.frm_grid, text="Play", font="Arial 12", width=8, command=self.play, relief=tk.RAISED)
+        self.btn_stop = tk.Button(master=self.frm_grid, text="Stop", font="Arial 12", width=8, command=self.stop, relief=tk.RAISED)
+        self.btn_next = tk.Button(master=self.frm_grid, text="Next", font="Arial 12", width=8, command=self.forward, relief=tk.RAISED)
+        self.btn_back = tk.Button(master=self.frm_grid, text="Back", font="Arial 12", width=8, command=self.backward, relief=tk.RAISED)
+        self.btn_shufful = tk.Button(master=self.frm_grid, text="Shufful", font="Arial 12", width=8, command=self.shuffle, relief=tk.RAISED)
 
         self.btn_play.grid(row=1, column=2)
         self.btn_stop.grid(row=3, column=2)
         self.btn_next.grid(row=2, column=3)
         self.btn_back.grid(row=2, column=1)
-        self.btn_shufful.grid(row=2, column=2)
+        self.btn_shufful.grid(row=2, column=2, padx=3, pady=3)
 
         self.frm_grid.pack(expand=True)
         self.frm_buttons.pack(expand=True, fill=tk.BOTH)
@@ -168,6 +169,7 @@ class GUI:
     def stop(self):
         if self.play_background.is_alive():
             self.play_background.terminate()
+            self.song_name.set("Music Stopped")
 
     # plays a random song
     def shuffle(self):
